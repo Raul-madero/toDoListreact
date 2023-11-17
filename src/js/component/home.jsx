@@ -1,10 +1,10 @@
 import React from "react";
-import ToDoList from "./ToDoList";
+import ToDo from "./ToDo";
 const Home = () => {
   return (
-    <div className="text-center w-50 my-5 mx-auto border border-success">
-      <h1>To Do List</h1>
-      <ToDoList />
+    <div className="text-center w-50 my-5 mx-auto border border-success bg-light bg-gradient">
+      <h1 className="text-info">To Do List</h1>
+      <ToDo />
     </div>
   );
 };
