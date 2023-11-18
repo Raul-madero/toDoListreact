@@ -12,3 +12,6 @@
 body {
   background-color: rgba(0, 0, 0, 0.656);
 }
+#hidden {
+  opacity: 0;
+}
