@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import Item from "./Item";
 
 const ToDo = () => {
   const [inputValue, setInputValue] = useState("");
   const [item, setItem] = useState([]);
+  const [showButton, setShowButton] = useState(null);
+
+  const handleDeleteClick = (indexToDelete) => {
+    const updatedItem = item.filter(
+      (_, currentIndex) => indexToDelete !== currentIndex
+    );
+    setItem(updatedItem);
+  };
+
+  const handleItemClick = (index) => {
+    setShowButton(index);
+  };
 
   return (
     <>
@@ -17,24 +28,48 @@ const ToDo = () => {
               value={inputValue}
               placeholder="Añade tareas a la lista"
               onKeyDown={(e) => {
-                if (e.key === "Enter" && inputValue != "") {
-                  setItem(item.concat(inputValue));
+                if (e.key === "Enter" && inputValue.trim() !== "") {
+                  setItem(item.concat(inputValue.trim()));
                   setInputValue("");
                 }
               }}
-            ></input>
+            />
           </li>
-          <Item task={item} />
+          {item.map((task, index) => (
+            <li
+              onClick={(e) => handleItemClick(index)}
+              onMouseLeave={() => setShowButton(null)}
+              className="bg-light list-group-item border-0 my-2 border-bottom border-success d-flex justify-content-between"
+              key={index}
+            >
+              {task}
+              {showButton === index && (
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleDeleteClick(index)}
+                >
+                  X
+                </button>
+              )}
+            </li>
+          ))}
         </ul>
         <div>
-          <p className="text-start border-secondary bg-secondary bg-opacity-50 p-2 my-2 w-50 fw-lighter fst-italic">
+          <p
+            className={`text-start p-2 my-2 w-50 fw-lighter fst-italic ${
+              item.length === 0 ? "text-secondary" : ""
+            }`}
+          >
             {item.length === 0
               ? "No hay tareas, agrega una tarea"
-              : item.length + " tareas por hacer"}
+              : `${item.length} ${
+                  item.length === 1 ? "tarea" : "tareas"
+                } por hacer`}
           </p>
         </div>
       </div>
     </>
   );
 };
+
 export default ToDo;
