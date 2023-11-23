@@ -17,7 +17,7 @@ const ToDo = () => {
   const handlesubmit = () => {
     fetch("https://playground.4geeks.com/apis/fake/todos/user/raul", {
       method: "PUT",
-      body: JSON.stringify(item),
+      body: JSON.stringify([...item, inputValue.trim()]),
       headers: {
         "Content-Type": "application/json",
       },
