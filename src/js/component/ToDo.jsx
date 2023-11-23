@@ -1,10 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const ToDo = () => {
   const [inputValue, setInputValue] = useState("");
   const [item, setItem] = useState([]);
-  const [showButton, setShowButton] = useState(null);
+  const [showButton, setShowButton] = useState("");
 
+  useEffect(() => {
+    fetchItems();
+  }, []);
+  const fetchItems = () => {
+    fetch("https://playground.4geeks.com/apis/fake/todos/user/raul")
+      .then((response) => response.json())
+      .then((data) => setItem(data))
+      .catch((error) => console.log("Error al traer tareas de la API", error));
+  };
+  const handlesubmit = () => {
+    fetch("https://playground.4geeks.com/apis/fake/todos/user/raul", {
+      method: "PUT",
+      body: JSON.stringify(item),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        console.log(response.ok);
+        console.log(response.status);
+        console.log(response.text());
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => console.log(error));
+  };
   const handleDeleteClick = (indexToDelete) => {
     const updatedItem = item.filter(
       (_, currentIndex) => indexToDelete !== currentIndex
@@ -31,13 +59,14 @@ const ToDo = () => {
                 if (e.key === "Enter" && inputValue.trim() !== "") {
                   setItem(item.concat(inputValue.trim()));
                   setInputValue("");
+                  handlesubmit();
                 }
               }}
             />
           </li>
           {item.map((task, index) => (
             <li
-              onClick={(e) => handleItemClick(index)}
+              onClick={() => handleItemClick(index)}
               onMouseLeave={() => setShowButton(null)}
               className="bg-light list-group-item border-0 my-2 border-bottom border-success d-flex justify-content-between"
               key={index}
