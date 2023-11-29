@@ -4,15 +4,29 @@ const ToDo = () => {
   const [inputValue, setInputValue] = useState("");
   const [item, setItem] = useState([]);
   const [showButton, setShowButton] = useState("");
-  const urlAPI = "https://jsonplaceholder.typicode.com/";
+  const urlAPI = "https://playground.4geeks.com/apis/fake/todos/";
   useEffect(() => {
+    // createUser();
     getTodos();
   }, []);
+  async function createUser() {
+    try {
+      const res = await fetch(urlAPI + "user/raul", {
+        method: "POST",
+        body: JSON.stringify([]),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const json = await res.json();
+      console.log(json);
+    } catch (err) {}
+  }
   async function getTodos() {
     try {
-      const res = await fetch(urlAPI + "todos");
+      const res = await fetch(urlAPI + "user/raul");
       const json = await res.json();
-      setItem(json);
+      setItem(item.concat(json));
       console.log(json);
     } catch (error) {
       console.log(error);
@@ -31,29 +45,31 @@ const ToDo = () => {
   };
   async function handleSubmit() {
     try {
-      const res = await fetch(urlAPI + "posts", {
-        method: "POST",
-        body: JSON.stringify({
-          title: inputValue,
-          body: "bar",
-          id: 1,
-        }),
+      const res = await fetch(urlAPI + "user/raul", {
+        method: "PUT",
+        body: JSON.stringify([
+          {
+            label: inputValue,
+            done: false,
+          },
+        ]),
         headers: {
           "Content-Type": "application/json; UTF-8",
         },
       });
       const json = await res.json();
-      getTodos();
       console.log(json);
+      getTodos();
     } catch (error) {
       console.log(error);
     }
   }
   async function deleteAllToDos() {
     try {
-      const res = await fetch(urlAPI + "todos/*", {
+      const res = await fetch(urlAPI + "user/raul", {
         method: "DELETE",
       });
+      setUser("");
       setItem([]);
       console.log(res);
     } catch (error) {
@@ -88,7 +104,7 @@ const ToDo = () => {
                 className="bg-light list-group-item border-0 my-2 border-bottom border-success d-flex justify-content-between"
                 key={index}
               >
-                {task.title}
+                {task.label}
                 {showButton === index && (
                   <button
                     className="btn btn-danger"
