@@ -4,35 +4,21 @@ const ToDo = () => {
   const [inputValue, setInputValue] = useState("");
   const [item, setItem] = useState([]);
   const [showButton, setShowButton] = useState("");
-
+  const urlAPI = "https://jsonplaceholder.typicode.com/";
   useEffect(() => {
-    fetchItems();
+    getTodos();
   }, []);
-  const fetchItems = () => {
-    fetch("https://playground.4geeks.com/apis/fake/todos/user/raul")
-      .then((response) => response.json())
-      .then((data) => setItem(data))
-      .catch((error) => console.log("Error al traer tareas de la API", error));
-  };
-  const handlesubmit = () => {
-    fetch("https://playground.4geeks.com/apis/fake/todos/user/raul", {
-      method: "PUT",
-      body: JSON.stringify([...item, inputValue.trim()]),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        console.log(response.ok);
-        console.log(response.status);
-        console.log(response.text());
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => console.log(error));
-  };
+  async function getTodos() {
+    try {
+      const res = await fetch(urlAPI + "todos");
+      const json = await res.json();
+      setItem(json);
+      console.log(json);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const handleDeleteClick = (indexToDelete) => {
     const updatedItem = item.filter(
       (_, currentIndex) => indexToDelete !== currentIndex
@@ -43,7 +29,37 @@ const ToDo = () => {
   const handleItemClick = (index) => {
     setShowButton(index);
   };
-
+  async function handleSubmit() {
+    try {
+      const res = await fetch(urlAPI + "posts", {
+        method: "POST",
+        body: JSON.stringify({
+          title: inputValue,
+          body: "bar",
+          id: 1,
+        }),
+        headers: {
+          "Content-Type": "application/json; UTF-8",
+        },
+      });
+      const json = await res.json();
+      getTodos();
+      console.log(json);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async function deleteAllToDos() {
+    try {
+      const res = await fetch(urlAPI + "todos/*", {
+        method: "DELETE",
+      });
+      setItem([]);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <div className="container">
@@ -59,30 +75,36 @@ const ToDo = () => {
                 if (e.key === "Enter" && inputValue.trim() !== "") {
                   setItem(item.concat(inputValue.trim()));
                   setInputValue("");
-                  handlesubmit();
+                  handleSubmit();
                 }
               }}
             />
           </li>
-          {item.map((task, index) => (
-            <li
-              onClick={() => handleItemClick(index)}
-              onMouseLeave={() => setShowButton(null)}
-              className="bg-light list-group-item border-0 my-2 border-bottom border-success d-flex justify-content-between"
-              key={index}
-            >
-              {task}
-              {showButton === index && (
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDeleteClick(index)}
-                >
-                  X
-                </button>
-              )}
-            </li>
-          ))}
+          {item.length > 0 &&
+            item.map((task, index) => (
+              <li
+                onClick={() => handleItemClick(index)}
+                onMouseLeave={() => setShowButton(null)}
+                className="bg-light list-group-item border-0 my-2 border-bottom border-success d-flex justify-content-between"
+                key={index}
+              >
+                {task.title}
+                {showButton === index && (
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteClick(index)}
+                  >
+                    X
+                  </button>
+                )}
+              </li>
+            ))}
         </ul>
+        <div>
+          <button className="btn btn-danger" onClick={deleteAllToDos}>
+            Eliminar Todo
+          </button>
+        </div>
         <div>
           <p
             className={`text-start p-2 my-2 w-50 fw-lighter fst-italic ${
